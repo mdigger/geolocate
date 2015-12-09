@@ -7,6 +7,8 @@ import (
 
 // Your API Keys
 const (
+	googleAPIKey = "<API Key>"
+	yandexAPIKey = "<API Key>"
 )
 
 func TestLocator(t *testing.T) {
