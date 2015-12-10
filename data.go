@@ -20,8 +20,8 @@ type Fallbacks struct {
 type CellTower struct {
 	MobileCountryCode uint16 `json:"mobileCountryCode"`        // The mobile country code.
 	MobileNetworkCode uint16 `json:"mobileNetworkCode"`        // The mobile network code.
-	CellId            uint32 `json:"cellId"`                   // The cell id or cell identity.
 	LocationAreaCode  uint16 `json:"locationAreaCode"`         // The location area code for GSM and WCDMA networks. The tracking area code for LTE networks.
+	CellId            uint32 `json:"cellId"`                   // The cell id or cell identity.
 	SignalStrength    int16  `json:"signalStrength,omitempty"` // The signal strength for this cell network, either the RSSI or RSCP.
 	Age               uint32 `json:"age,omitempty"`            // The number of milliseconds since this networks was last detected.
 	TimingAdvance     uint8  `json:"timingAdvance,omitempty"`  // The timing advance value for this cell network.
