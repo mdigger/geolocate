@@ -8,7 +8,7 @@ type Request struct {
 	ConsiderIp            bool              `json:"considerIp"`                      // Should the clients IP address be used to locate it, defaults to true.
 	CellTowers            []CellTower       `json:"cellTowers,omitempty"`            // Array of cell towers
 	WifiAccessPoints      []WifiAccessPoint `json:"wifiAccessPoints,omitempty"`      // Array of wifi access points
-	IPAddress             string            `json:"-"`                               // Client IP Address
+	IPAddress             string            `json:"ipaddress,omitempty"`             // Client IP Address
 	Fallbacks             *Fallbacks        `json:"fallbacks,omitempty"`             // The fallback section is a custom addition to the GLS API.
 }
 
