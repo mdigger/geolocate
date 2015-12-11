@@ -42,5 +42,5 @@ type Response struct {
 
 type Point struct {
 	Lat float64 `json:"lat"`
-	Lng float64 `json:"lng"`
+	Lon float64 `json:"lng"`
 }

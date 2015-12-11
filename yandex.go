@@ -98,7 +98,7 @@ func (l *yandex) Get(req Request) (*Response, error) {
 	response := Response{
 		Location: Point{
 			Lat: yresp.Position.Latitude,
-			Lng: yresp.Position.Longitude,
+			Lon: yresp.Position.Longitude,
 		},
 		Accuracy: yresp.Position.Precision,
 	}

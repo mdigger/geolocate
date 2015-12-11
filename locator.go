@@ -77,6 +77,7 @@ func (l *base) Get(req Request) (*Response, error) {
 	if req.RadioType == "" {
 		req.RadioType = "gsm" // Mozilla не находит данные, если не указано
 	}
+	req.IPAddress = "" // не используется в этих запросах
 	data, err := json.Marshal(req)
 	if err != nil {
 		return nil, err

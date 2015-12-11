@@ -55,5 +55,4 @@ func TestLocator(t *testing.T) {
 		t.Error(err)
 	}
 	fmt.Println("Yandex:", resp)
-
 }
