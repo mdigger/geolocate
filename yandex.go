@@ -135,11 +135,11 @@ type yandexCommon struct {
 }
 
 type yandexPosition struct {
-	Latitude          float64 `json:"latitude"`
-	Longitude         float64 `json:"longitude"`
-	Altitude          float64 `json:"altitude"`
-	Precision         float64 `json:"precision"`
-	AltitudePrecision float64 `json:"altitude_precision"`
+	Latitude          float32 `json:"latitude"`
+	Longitude         float32 `json:"longitude"`
+	Altitude          float32 `json:"altitude"`
+	Precision         float32 `json:"precision"`
+	AltitudePrecision float32 `json:"altitude_precision"`
 	Type              string  `json:"type"` // Способ определения местоположения: gsm, wifi, ip
 }
 
