@@ -37,10 +37,10 @@ type WifiAccessPoint struct {
 
 type Response struct {
 	Location Point   `json:"location"` // The user’s estimated latitude and longitude, in degrees.
-	Accuracy float32 `json:"accuracy"` // The accuracy of the estimated location, in meters.
+	Accuracy float64 `json:"accuracy"` // The accuracy of the estimated location, in meters.
 }
 
 type Point struct {
-	Lat float32 `json:"lat"`
-	Lon float32 `json:"lng"`
+	Lat float64 `json:"lat"`
+	Lon float64 `json:"lng"`
 }
