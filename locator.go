@@ -10,37 +10,42 @@ import (
 )
 
 var (
-	RequestTimeout = time.Second * 10 // максимальное время ожидания ответа
-	IgnoreIPMethod = true             // не использовать определение по IP-адресу
+	// the maximum waiting time for a response
+	RequestTimeout = time.Second * 10
+	// do not use definition of by IP address
+	IgnoreIPMethod = true
 )
 
-// Ошибки, возвращаемые при запросе данных стандартного сервиса геолокации.
+// Error returned when a data request is standard service of geolocation.
 var (
-	ErrBadRequest = errors.New(http.StatusText(http.StatusBadRequest)) // неверный формат данных запроса или плохой ключ
-	ErrForbidden  = errors.New(http.StatusText(http.StatusForbidden))  // исчерпан лимит запросов
-	ErrNotFound   = errors.New(http.StatusText(http.StatusNotFound))   // информация не найдена
+	// invalid data format of the request or a bad key
+	ErrBadRequest = errors.New(http.StatusText(http.StatusBadRequest))
+	// over the limit of queries
+	ErrForbidden = errors.New(http.StatusText(http.StatusForbidden))
+	// information not found
+	ErrNotFound = errors.New(http.StatusText(http.StatusNotFound))
 )
 
-// URL сервисов геолокации.
+// The URL of the location services.
 const (
 	Mozilla = "https://location.services.mozilla.com/v1/geolocate"
 	Google  = "https://www.googleapis.com/geolocation/v1/geolocate"
 	Yandex  = "http://api.lbs.yandex.net/geolocation"
 )
 
-// Locator описывает интерфейс, поддерживаемый всеми типами сервисов геолокации.
+// Locator describes the interface supported by all types of location services.
 type Locator interface {
 	Get(req Request) (*Response, error)
 }
 
-// base описывает информацию о сервисе геолокации, использующем стандартный тип
-// запросов, такие как Mozilla и Google Locator.
+// base describes information about the geolocation service, using standard
+// types of queries, such as Mozilla and Google Locator.
 type base struct {
 	serviceUrl string       // адрес для запроса сервиса
 	client     *http.Client // HTTP-клиент
 }
 
-// New возвращает новый инициализированный сервис геолокации.
+// New returns a new initialized the geolocation service.
 func New(serviceUrl, apiKey string) (locator Locator, err error) {
 	if serviceUrl == Yandex { // для Яндекса возвращаем отдельный обрабочик
 		return &yandex{
@@ -50,14 +55,13 @@ func New(serviceUrl, apiKey string) (locator Locator, err error) {
 			},
 		}, nil
 	}
-	if apiKey != "" { // добавляем ключ к запросу
+	if apiKey != "" {
 		serviceUrl += "?key=" + url.QueryEscape(apiKey)
 	}
-	// проверяем, что URL валиден
 	if _, err := url.ParseRequestURI(serviceUrl); err != nil {
 		return nil, err
 	}
-	return &base{ // возвращаем базовый обработчик геолокации
+	return &base{
 		serviceUrl: serviceUrl,
 		client: &http.Client{
 			Timeout: RequestTimeout,
@@ -65,7 +69,8 @@ func New(serviceUrl, apiKey string) (locator Locator, err error) {
 	}, nil
 }
 
-// Get передает данные на сервер геолокации и возвращает от него разобранный ответ или ошибку.
+// Get transmits data to the server geolocation and returns it parsed from the
+// response or the error.
 func (l *base) Get(req Request) (*Response, error) {
 	req.ConsiderIp = !IgnoreIPMethod
 	if IgnoreIPMethod {
@@ -75,27 +80,27 @@ func (l *base) Get(req Request) (*Response, error) {
 		}
 	}
 	if req.RadioType == "" {
-		req.RadioType = "gsm" // Mozilla не находит данные, если не указано
+		req.RadioType = "gsm" // Mozilla does not find the data if not specified
 	}
-	req.IPAddress = "" // не используется в этих запросах
+	req.IPAddress = "" // not used in the queries
 	data, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println(string(data))
-	resp, err := l.client.Post(l.serviceUrl, "application/json", bytes.NewReader(data))
+	resp, err := l.client.Post(l.serviceUrl, "application/json",
+		bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
 	switch resp.StatusCode {
-	case 200: // все хорошо — данные получены
-	case 400: // неверный формат данных запроса или плохой ключ
+	case 200: // all is well — data obtained
+	case 400: // invalid data format of the request or a bad key
 		return nil, ErrBadRequest
-	case 403: // исчерпан лимит запросов
+	case 403: // over the limit of queries
 		return nil, ErrForbidden
-	case 404: // информация не найдена
+	case 404: // information not found
 		return nil, ErrNotFound
-	default: // другая нехорошая ошибка
+	default: // another bad error
 		return nil, errors.New(http.StatusText(resp.StatusCode))
 	}
 	var response Response

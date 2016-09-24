@@ -7,15 +7,14 @@ import (
 	"net/url"
 )
 
-// yandex описывает обработчик геозапросов для сервиса Яндекс.
+// yandex describes the  handler location requests for Yandex.
 type yandex struct {
-	apiKey string       // ключ для получения данных
-	client *http.Client // HTTP-клиент
+	apiKey string       // the key to retrieve the data
+	client *http.Client // HTTP client
 }
 
-// Get передает данные на сервис Яндекс и возвращает разобранный ответ.
+// Get transmits data to Yandex and returns a parsed response.
 func (l *yandex) Get(req Request) (*Response, error) {
-	// формируем данные для запроса в формате Yandex
 	cells := make([]yandexCell, len(req.CellTowers))
 	for i, cell := range req.CellTowers {
 		cells[i] = yandexCell{
@@ -50,51 +49,50 @@ func (l *yandex) Get(req Request) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println(string(data))
-	// для Яндекса это передается в виде запроса формы
+	// for Yandex it is transmitted in the form of a query of the form
 	params := make(url.Values, 1)
 	params.Set("json", string(data))
 	resp, err := l.client.PostForm(Yandex, params)
 	if err != nil {
 		return nil, err
 	}
-	// согласно документации Яндекс не возвращает коды ошибок
-	// так что это оставлено просто на всякий случай
+	// according to the documentation Yandex does not return error codes, so it
+	// is left just in case
 	switch resp.StatusCode {
-	case 200: // все хорошо — данные получены
-	case 400: // неверный формат данных запроса или плохой ключ
+	case 200:
+	case 400:
 		return nil, ErrBadRequest
-	case 403: // исчерпан лимит запросов
+	case 403:
 		return nil, ErrForbidden
-	case 404: // информация не найдена
+	case 404:
 		return nil, ErrNotFound
-	default: // другая нехорошая ошибка
+	default:
 		return nil, errors.New(http.StatusText(resp.StatusCode))
 	}
-	// декодируем ответ
+	// decode response
 	var yresp yandexRespose
 	err = json.NewDecoder(resp.Body).Decode(&yresp)
 	resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
-	// проверяем текст ошибки и обрабатываем аналогично общему методу всех локаторов
+	// check the error text, and treated similarly to a public method of all the
+	// locators
 	switch yresp.Error {
-	case "": // все хорошо — ошибки нет — игнорируем
+	case "": // all is well — no error — ignore
 	case "JSON request is invalid":
 		return nil, ErrBadRequest
 	case "invalid api_key":
 		return nil, ErrForbidden
 	case "Location not found":
 		return nil, ErrNotFound
-	default: // другой текст ошибки
+	default: // other text errors
 		return nil, errors.New(yresp.Error)
 	}
-	// проверяем, что метод определения не по IP
+	// check that the method definitions are not by IP
 	if IgnoreIPMethod && yresp.Position.Type == "ip" {
 		return nil, ErrNotFound
 	}
-	// формируем ответ
 	response := Response{
 		Location: Point{
 			Lat: yresp.Position.Latitude,
@@ -140,7 +138,7 @@ type yandexPosition struct {
 	Altitude          float64 `json:"altitude"`
 	Precision         float64 `json:"precision"`
 	AltitudePrecision float64 `json:"altitude_precision"`
-	Type              string  `json:"type"` // Способ определения местоположения: gsm, wifi, ip
+	Type              string  `json:"type"` // Method positioning: gsm, wifi, ip
 }
 
 type yandexRespose struct {
