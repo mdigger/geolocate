@@ -1,6 +1,7 @@
 # GeoLocate
 
 [![Build Status](https://travis-ci.org/mdigger/geolocate.svg?branch=master)](https://travis-ci.org/mdigger/geolocate)
+[![GoDoc](https://godoc.org/github.com/mdigger/geolocate?status.svg)](https://godoc.org/github.com/mdigger/geolocate)
 
 ```go
 request := Request{
