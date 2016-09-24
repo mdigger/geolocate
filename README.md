@@ -1,5 +1,7 @@
 # GeoLocate
 
+[![Build Status](https://travis-ci.org/mdigger/geolocate.svg?branch=master)](https://travis-ci.org/mdigger/geolocate)
+
 ```go
 request := Request{
 	CellTowers: []CellTower{
